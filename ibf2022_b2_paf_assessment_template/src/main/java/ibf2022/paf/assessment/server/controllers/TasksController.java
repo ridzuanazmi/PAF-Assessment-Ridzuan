@@ -23,7 +23,7 @@ public class TasksController {
     @Autowired
     private TodoService todoService;
 
-    @PostMapping(path = "/task", produces = "application/json", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(path = "/task")
     public ModelAndView save(
             @RequestParam("username") String username,
             @RequestParam Map<String, String> formData) {
@@ -34,7 +34,6 @@ public class TasksController {
         // To match the naming of Description-0/1/2 etc. and store it in
         // a list of TaskRequest
         int index = 0;
-
         while (formData.containsKey("description-" + index)) {
 
             String description = formData.get("description-" + index);
@@ -55,25 +54,27 @@ public class TasksController {
             // Call the upsertTask method from the ToDoService to insert tasks
             List<Task> tasks = todoService.upsertTask(username, taskRequests);
 
-            // Returns appropiate model and view 
+            ModelAndView mv = new ModelAndView();
+            // Returns appropiate model and view
             if (!tasks.isEmpty()) {
 
-                ModelAndView modelAndView = new ModelAndView("result.html");
-                modelAndView.addObject("username", username);
-                modelAndView.addObject("taskCount", tasks.size());
-                modelAndView.setStatus(HttpStatus.OK);
-                return modelAndView;
+                mv.addObject("username", username);
+                mv.addObject("taskCount", tasks.size());
+                mv.setStatus(HttpStatus.OK);
+                mv.setViewName("result.html");
+                return mv;
             } else {
 
-                ModelAndView errorModelAndView = new ModelAndView("error.html");
-                errorModelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-                return errorModelAndView;
+                mv.setViewName("error.html");
+                mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                return mv;
             }
         } catch (Exception e) {
 
-            ModelAndView errorModelAndView = new ModelAndView("error.html");
-            errorModelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            return errorModelAndView;
+            ModelAndView mv = new ModelAndView();
+            mv.setViewName("error.html");
+            mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            return mv;
         }
 
     }

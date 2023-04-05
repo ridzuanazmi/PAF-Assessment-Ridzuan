@@ -1,7 +1,6 @@
 package ibf2022.paf.assessment.server.repositories;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,10 +52,5 @@ public class UserRepository {
         } else {
             return null;
         }
-    }
-
-    // Helper method to generate UUID
-    public String generateUUID() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 }

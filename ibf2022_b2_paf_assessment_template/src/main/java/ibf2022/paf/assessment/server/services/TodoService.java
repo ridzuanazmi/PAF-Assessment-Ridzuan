@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ibf2022.paf.assessment.server.Exceptions.InvalidUsernameException;
 import ibf2022.paf.assessment.server.Exceptions.TaskInsertFailedException;
 import ibf2022.paf.assessment.server.Exceptions.UserInsertFailedException;
 import ibf2022.paf.assessment.server.Payload.TaskRequest;
@@ -30,6 +32,13 @@ public class TodoService {
     @Transactional
     public List<Task> upsertTask(String username, List<TaskRequest> taskRequests) {
 
+        // Validate username (only letters and digits allowed)
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9]+$");
+        if (!pattern.matcher(username).matches()) {
+            throw new InvalidUsernameException(
+                    "Invalid username. Username should not contain spaces or special characters.");
+        }
+
         // 1) checks if the username exists
         Optional<User> userOpt = uRepo.findUserByUsername(username);
         String userId;
@@ -38,7 +47,7 @@ public class TodoService {
         if (userOpt.isEmpty()) {
             // Creates a new user
             User newUser = new User();
-            newUser.setUserId(generateUserId());
+            newUser.setUserId(generateUserId()); // generate UUID String
             newUser.setUsername(username);
             newUser.setName(capitalizeFirstLetter(username)); // Generates the name from username
             userId = uRepo.insertUser(newUser); // carries the user id
