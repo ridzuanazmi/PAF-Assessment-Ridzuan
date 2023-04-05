@@ -35,7 +35,8 @@ public class UserRepository {
             }
         };
 
-        return jTemplate.query(SELECT_USER_BYUSERNAME_SQL, resultSetExtractor, username);
+        return jTemplate.query(SELECT_USER_BYUSERNAME_SQL,
+                resultSetExtractor, username);
     }
 
     // Method that creates a user. Returns the userId if successful,
